@@ -19,8 +19,7 @@
 <meta property="og:locale" content="es_ES">
 
   <!-- HLS.js – única librería externa, necesaria para reproducir .m3u8 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.7/hls.min.js"></script>
-
+ 
   <style>
     /* ════════════════════════════════════
        VARIABLES
@@ -53,20 +52,12 @@
 }
 
 .ad-slot{
-  width:320px;
-  max-width:100%;
-  height:auto;
-  min-height:50px;
-  background:var(--surface);
-  border:1px dashed rgba(240,180,41,.25);
-  border-radius:6px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:10px;color:rgba(122,143,166,.5);
-  letter-spacing:.8px;text-transform:uppercase;
-  overflow:visible;
-  flex-shrink:0;
+width:320px;
+height:50px;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:auto;
 }
     /* ════════════════════════════════════
        RESET / BASE
@@ -483,49 +474,25 @@ Venezuela vs Italia EN VIVO | Clásico Mundial de Béisbol 2026
   <!-- ══════════════════════════════════
        REPRODUCTOR EN VIVO (HLS real)
   ══════════════════════════════════ -->
+<!-- ══════════════════════════════════
+       REPRODUCTOR EN VIVO (iframe externo)
+  ══════════════════════════════════ -->
   <div class="player-shell">
     <div class="player-box" id="player-box">
 
-      <!-- Video nativo -->
-      <video id="live-video" playsinline webkit-playsinline muted></video>
+      <!-- iframe al canal externo -->
+      <iframe
+        id="live-iframe"
+        src="https://vtvcanal32.com.do/"
+        allowfullscreen
+        allow="autoplay; fullscreen; encrypted-media"
+        scrolling="no"
+        frameborder="0"
+        style="position:absolute;inset:0;width:100%;height:100%;border:none;background:#000;"
+      ></iframe>
 
-      <!-- Chip LIVE (aparece al reproducir) -->
-      <div class="player-live" id="player-live">🔴 LIVE</div>
-
-      <!-- Overlay de carga -->
-      <div class="loading-overlay" id="loading-overlay">
-        <div class="spinner"></div>
-        <p class="load-text">Conectando transmisión…</p>
-      </div>
-
-      <!-- Overlay de error -->
-      <div class="error-overlay" id="error-overlay">
-        <div class="err-icon">📡</div>
-        <p class="err-title">Señal no disponible </p>
-        <p class="err-sub">La transmisión está interrumpida o aún no ha iniciado.</p>
-        <button class="retry-btn" id="retry-btn">🔄 Reintentar</button>
-      </div>
-
-      <!-- Barra de controles -->
-      <div class="ctrl-bar autohide" id="ctrl-bar">
-        <button id="btn-play" title="Play / Pausa" aria-label="Play">
-          <!-- Play icon (default) -->
-          <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          <!-- Pause icon (oculto) -->
-          <svg id="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-        </button>
-
-        <div class="prog-wrap"><div class="prog-fill"></div></div>
-
-        <span class="time-lbl">LIVE</span>
-
-        <button id="btn-vol" title="Silenciar / Activar" aria-label="Volumen">
-          <svg id="icon-vol-on" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-          <svg id="icon-vol-off" viewBox="0 0 24 24" style="display:none"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
-        </button>
-
-        <button id="btn-fs" title="Pantalla completa" aria-label="Fullscreen">⛶</button>
-      </div>
+      <!-- Chip LIVE -->
+      <div class="player-live show" id="player-live">🔴 LIVE</div>
 
     </div><!-- /player-box -->
   </div><!-- /player-shell -->
@@ -644,155 +611,16 @@ Este partido define al equipo que avanzará a la final del torneo internacional.
 ══════════════════════════════════ -->
 <script>
 /* ─────────────────────────────────────────
-   CONFIGURACIÓN — edita solo estos valores
+   CONFIGURACIÓN
 ───────────────────────────────────────── */
-var HLS_URL   = 'https://986244.gvideo.io/mpegts/986244_4049034/media_mpegts_0.m3u8';
 var SMARTLINK = 'https://www.effectivegatecpm.com/xti2g5cq?key=4e163064b8d105be1f5107285ffe3c71';
-
-/* ─────────────────────────────────────────
-   ELEMENTOS
-───────────────────────────────────────── */
-var video       = document.getElementById('live-video');
-var loadOverlay = document.getElementById('loading-overlay');
-var errOverlay  = document.getElementById('error-overlay');
-var playerLive  = document.getElementById('player-live');
-var btnPlay     = document.getElementById('btn-play');
-var iconPlay    = document.getElementById('icon-play');
-var iconPause   = document.getElementById('icon-pause');
-var btnVol      = document.getElementById('btn-vol');
-var iconVolOn   = document.getElementById('icon-vol-on');
-var iconVolOff  = document.getElementById('icon-vol-off');
-var btnFs       = document.getElementById('btn-fs');
-var retryBtn    = document.getElementById('retry-btn');
-var stickyAd    = document.getElementById('sticky-ad');
-var closeSticky = document.getElementById('close-sticky');
-var ctrlBar     = document.getElementById('ctrl-bar');
-var playerBox   = document.getElementById('player-box');
-
-/* ─────────────────────────────────────────
-   HLS PLAYER
-───────────────────────────────────────── */
-var hls;
-
-function initPlayer(){
-  loadOverlay.classList.remove('hidden');
-  errOverlay.classList.remove('show');
-  playerLive.classList.remove('show');
-
-  if(Hls.isSupported()){
-    if(hls){ hls.destroy(); }
-    hls = new Hls({
-      enableWorker: true,
-      lowLatencyMode: true,
-      backBufferLength: 30,
-    });
-    hls.loadSource(HLS_URL);
-    hls.attachMedia(video);
-
-    hls.on(Hls.Events.MANIFEST_PARSED, function(){
-      video.play().catch(function(){
-        /* Autoplay bloqueado: mostrar play manual */
-        loadOverlay.classList.add('hidden');
-        playerLive.classList.add('show');
-      });
-    });
-
-    hls.on(Hls.Events.ERROR, function(ev, data){
-      if(data.fatal){
-        switch(data.type){
-          case Hls.ErrorTypes.NETWORK_ERROR:
-            hls.startLoad(); break;
-          case Hls.ErrorTypes.MEDIA_ERROR:
-            hls.recoverMediaError(); break;
-          default:
-            showError(); break;
-        }
-      }
-    });
-
-  } else if(video.canPlayType('application/vnd.apple.mpegurl')){
-    /* Safari / iOS nativo */
-    video.src = HLS_URL;
-    video.addEventListener('loadedmetadata', function(){
-      video.play().catch(function(){
-        loadOverlay.classList.add('hidden');
-        playerLive.classList.add('show');
-      });
-    }, {once:true});
-    video.addEventListener('error', showError, {once:true});
-  } else {
-    showError();
-  }
-}
-
-function showError(){
-  loadOverlay.classList.add('hidden');
-  errOverlay.classList.add('show');
-  playerLive.classList.remove('show');
-}
-
-/* Eventos del video */
-video.addEventListener('playing', function(){
-  loadOverlay.classList.add('hidden');
-  errOverlay.classList.remove('show');
-  playerLive.classList.add('show');
-  syncPlayIcon();
-});
-video.addEventListener('waiting', function(){
-  loadOverlay.classList.remove('hidden');
-});
-video.addEventListener('canplay', function(){
-  loadOverlay.classList.add('hidden');
-});
-video.addEventListener('pause',  syncPlayIcon);
-video.addEventListener('play',   syncPlayIcon);
-
-function syncPlayIcon(){
-  var paused = video.paused;
-  iconPlay.style.display  = paused  ? 'block' : 'none';
-  iconPause.style.display = !paused ? 'block' : 'none';
-}
-
-/* ─────────────────────────────────────────
-   CONTROLES
-───────────────────────────────────────── */
-btnPlay.addEventListener('click', function(e){
-  e.stopPropagation();
-  if(video.paused){ video.play(); }
-  else { video.pause(); }
-});
-
-btnVol.addEventListener('click', function(e){
-  e.stopPropagation();
-  video.muted = !video.muted;
-  iconVolOn.style.display  = video.muted ? 'none'  : 'block';
-  iconVolOff.style.display = video.muted ? 'block' : 'none';
-});
-
-btnFs.addEventListener('click', function(e){
-  e.stopPropagation();
-  var el = document.getElementById('player-box');
-  if(!document.fullscreenElement){
-    (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen).call(el);
-  } else {
-    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-  }
-});
-
-/* Mostrar controles al tocar en móvil */
-var ctrlTimer;
-playerBox.addEventListener('touchstart', function(){
-  ctrlBar.classList.remove('autohide');
-  clearTimeout(ctrlTimer);
-  ctrlTimer = setTimeout(function(){ ctrlBar.classList.add('autohide'); }, 3000);
-},{passive:true});
-
-/* Retry */
-retryBtn.addEventListener('click', initPlayer);
 
 /* ─────────────────────────────────────────
    STICKY AD — cerrar
 ───────────────────────────────────────── */
+var stickyAd    = document.getElementById('sticky-ad');
+var closeSticky = document.getElementById('close-sticky');
+
 closeSticky.addEventListener('click', function(){
   stickyAd.classList.add('hidden');
 });
@@ -803,11 +631,6 @@ closeSticky.addEventListener('click', function(){
 document.querySelectorAll('.btns a').forEach(function(a){
   a.href = SMARTLINK;
 });
-
-/* ─────────────────────────────────────────
-   INICIAR
-───────────────────────────────────────── */
-initPlayer();
 </script>
       <div style="position:absolute; left:-9999px;">
 ver venezuela vs italia en vivo  
