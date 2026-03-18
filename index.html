@@ -60,6 +60,13 @@ align-items:center;
 justify-content:center;
 margin:auto;
 }
+
+/* Native banner — ancho completo, sin altura fija para no cortar */
+.native-wrap{
+  width:100%;
+  padding:10px 0;
+  overflow:visible;
+}
     /* ════════════════════════════════════
        RESET / BASE
     ════════════════════════════════════ */
@@ -279,11 +286,6 @@ margin:auto;
     }
 
     /* ════════════════════════════════════
-       AD NATIVO / MEDIO — no intrusivo
-       (banner sticky inferior sutil)
-    ════════════════════════════════════ */
-
-    /* ════════════════════════════════════
        BOTONES DE ACCIÓN
     ════════════════════════════════════ */
     .btns{
@@ -357,8 +359,6 @@ margin:auto;
 
     /* ════════════════════════════════════
        STICKY AD INFERIOR (no intrusivo)
-       320×50 fijo en la parte de abajo
-       Con botón de cerrar para no molestar
     ════════════════════════════════════ */
     .sticky-ad{
       position:fixed;bottom:0;left:0;right:0;
@@ -501,9 +501,7 @@ Venezuela vs Estados Unidos EN VIVO | Clásico Mundial de Béisbol 2026
       <!-- Barra de controles -->
       <div class="ctrl-bar autohide" id="ctrl-bar">
         <button id="btn-play" title="Play / Pausa" aria-label="Play">
-          <!-- Play icon (default) -->
           <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          <!-- Pause icon (oculto) -->
           <svg id="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
 
@@ -521,6 +519,7 @@ Venezuela vs Estados Unidos EN VIVO | Clásico Mundial de Béisbol 2026
 
     </div><!-- /player-box -->
   </div><!-- /player-shell -->
+
   <section style="margin-top:20px;font-size:14px;line-height:1.6;color:#7a8fa6">
 <h2 style="color:#ffffff;font-size:18px;margin-bottom:8px;">
 Venezuela vs Italia en vivo – World Baseball Classic 2026
@@ -541,21 +540,12 @@ Este partido define al equipo que ganara la final del torneo internacional.
 </section>
 
   <!-- ══════════════════════════════════
-       AD BANNER MEDIO 320×50
+       NATIVE BANNER — reemplaza banner medio
+       Se adapta solo al ancho disponible
   ══════════════════════════════════ -->
-  <div class="ad" style="padding-top:14px;">
-    <div class="ad-slot">
-    <script>
-  atOptions = {
-    'key' : '01cbe031341a82b25fc742db004c6aee',
-    'format' : 'iframe',
-    'height' : 50,
-    'width' : 320,
-    'params' : {}
-  };
-</script>
-<script src="https://www.highperformanceformat.com/01cbe031341a82b25fc742db004c6aee/invoke.js"></script>
-    </div>
+  <div class="native-wrap">
+    <script async="async" data-cfasync="false" src="https://pl28936287.effectivegatecpm.com/214845dcaf66c8479c2820229d479c76/invoke.js"></script>
+    <div id="container-214845dcaf66c8479c2820229d479c76"></div>
   </div>
 
   <!-- ══════════════════════════════════
@@ -683,7 +673,6 @@ function initPlayer(){
 
     hls.on(Hls.Events.MANIFEST_PARSED, function(){
       video.play().catch(function(){
-        /* Autoplay bloqueado: mostrar play manual */
         loadOverlay.classList.add('hidden');
         playerLive.classList.add('show');
       });
@@ -809,8 +798,10 @@ document.querySelectorAll('.btns a').forEach(function(a){
 ───────────────────────────────────────── */
 initPlayer();
 </script>
-      
+
+  <!-- Social Bar (ya estaba) -->
   <script src="https://pl28923994.effectivegatecpm.com/4a/3d/f5/4a3df5f80587af3ca85242c9beb4fca7.js"></script>
+  <!-- Popunder (ya estaba) -->
   <script src="https://pl28924003.effectivegatecpm.com/81/73/37/817337db88e009d5cb14663051d01d42.js"></script>
 </body>
 </html>
